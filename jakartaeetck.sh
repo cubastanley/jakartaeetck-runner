@@ -123,6 +123,12 @@ installRI() {
 
 "
 
+  if [ -z "${JAVA_HOME_RI}" ]; then
+    export JAVA_HOME_RI=$JAVA_HOME
+  fi
+  export JAVA_HOME_RI
+  echo "Java home for RI: $JAVA_HOME_RI"
+
   ##### installRI.sh starts here #####
   echo "Download and install GlassFish 5.0.1 ..."
   if [ -z "${GF_BUNDLE_URL}" ]; then
@@ -150,13 +156,19 @@ installRI() {
   fi
   chmod -R 777 ${CTS_HOME}/ri
 
+  echo "AS_JAVA=$JAVA_HOME_RI" >> ${CTS_HOME}/ri/glassfish/config/asenv.conf
 
+  # Catch errors in failing commands from this point onwards
+  set -e
+  trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+  trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+
+  ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} version
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${CTS_HOME}/change-admin-password.txt change-admin-password
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} start-domain
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} stop-domain
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} start-domain
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} enable-secure-admin
-  ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} version
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} stop-domain
   ${CTS_HOME}/ri/glassfish5/glassfish/bin/asadmin --user admin --passwordfile ${ADMIN_PASSWORD_FILE} start-domain
 
