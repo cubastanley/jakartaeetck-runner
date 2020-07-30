@@ -156,7 +156,7 @@ installRI() {
   fi
   chmod -R 777 ${CTS_HOME}/ri
 
-  echo "AS_JAVA=$JAVA_HOME_RI" >> ${CTS_HOME}/ri/glassfish/config/asenv.conf
+  echo "AS_JAVA=$JAVA_HOME_RI" >> ${CTS_HOME}/ri/glassfish5/glassfish/config/asenv.conf
 
   # Catch errors in failing commands from this point onwards
   set -e
